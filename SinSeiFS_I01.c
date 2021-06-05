@@ -84,15 +84,8 @@ static struct fuse_operations xmp_oper = {
   .getattr  = xmp_getattr,
 //   .readdir  = xmp_readdir,
 //   .mknod    = xmp_mknod,
-//   .mkdir    = xmp_mkdir,
-//   .unlink   = xmp_unlink,
-//   .rmdir    = xmp_rmdir,
-//   .rename   = xmp_rename,
-//   .truncate = xmp_truncate,
-//   .open     = xmp_open,
-//   .read     = xmp_read,
-//   .write    = xmp_write,
 };
 int main(int argc, char *argv[]){
-
+   umask(0);
+  return fuse_main(argc, argv, &xmp_oper, NULL);
 }
