@@ -16,6 +16,7 @@ c. When encoded directory is renamed to not have encoded name, then the director
 d. For every encoding of a directory (mkdir or rename) will be recorded in a log file. The format is : /home/[USER]/Downloads/[Directory Name] → /home/[USER]/Downloads/AtoZ_[Directory Name]
 e. Encoding method is also applied to all other directories inside the encoded directory.(rekursif)
 
+```shell
 void log_v1(char *from, char *to) {
     int i;
     for (i = strlen(to); i >= 0; i--) {
@@ -69,6 +70,7 @@ void decode_atbash(char *str) {
     atbash(str, s, str_length);
     printf("==== dec:atb:%s\n", str);
 }
+```
 
 2. Other than that, Sei proposed to create additional encryption methods to increase the security of their computer data . The following is the additional encryption method designed by Sei
 a. If a directory is created starting with “RX_[Nama]”, then that directory and its contents will be encoded with a rename according to problem 1 with an additional ROT13 algorithm (Atbash + ROT13).
@@ -114,6 +116,7 @@ Notes:
 It is not allowed to use system () and exec * (), unless there are exceptions in the question.
 The work is only done in 1 C program file with the format name SinSeiFS_ [Group] .c. 
 
+```shell
 void log_v2(char *str, int type) {
     FILE *log_file = fopen(logpath, "a");
 
@@ -132,3 +135,4 @@ void log_v2(char *str, int type) {
                 time_info->tm_min, time_info->tm_sec, str);
     }
 }
+```
