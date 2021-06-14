@@ -16,6 +16,60 @@ c. When encoded directory is renamed to not have encoded name, then the director
 d. For every encoding of a directory (mkdir or rename) will be recorded in a log file. The format is : /home/[USER]/Downloads/[Directory Name] → /home/[USER]/Downloads/AtoZ_[Directory Name]
 e. Encoding method is also applied to all other directories inside the encoded directory.(rekursif)
 
+void log_v1(char *from, char *to) {
+    int i;
+    for (i = strlen(to); i >= 0; i--) {
+        if (to[i] == '/') break;
+    }
+    if (strstr(to + i, ATOZ) == NULL) return;
+
+    FILE *log_file = fopen(logpath, "a");
+    fprintf(log_file, "%s -> %s\n", from, to);
+}
+
+void atbash(char *str, int start, int end) {
+    for (int i = start; i < end; i++) {
+        if (str[i] == '/') continue;
+        if (i != start && str[i] == '.') break;
+
+        if (str[i] >= 'A' && str[i] <= 'Z')
+            str[i] = 'Z' + 'A' - str[i];
+        else if (str[i] >= 'a' && str[i] <= 'z')
+            str[i] = 'z' + 'a' - str[i];
+    }
+}
+
+void encode_atbash(char *str) {
+    if (!strcmp(str, ".") || !strcmp(str, "..")) return;
+    atbash(str, 0, strlen(str));
+
+    printf("==== enc:atb:%s\n", str);
+}
+
+void decode_atbash(char *str) {
+    if (!strcmp(str, ".") || !strcmp(str, "..")) return;
+    if (strstr(str, "/") == NULL) return;
+    printf("==== before:%s\n", str);
+    int str_length = strlen(str), s = 0, i;
+    for (i = str_length; i >= 0; i--) {
+        if (str[i] == '/') break;
+
+        if (str[i] == '.') {
+            str_length = i;
+            break;
+        }
+    }
+    for (i = 0; i < str_length; i++) {
+        if (str[i] == '/') {
+            s = i + 1;
+            break;
+        }
+    }
+
+    atbash(str, s, str_length);
+    printf("==== dec:atb:%s\n", str);
+}
+
 2. Other than that, Sei proposed to create additional encryption methods to increase the security of their computer data . The following is the additional encryption method designed by Sei
 a. If a directory is created starting with “RX_[Nama]”, then that directory and its contents will be encoded with a rename according to problem 1 with an additional ROT13 algorithm (Atbash + ROT13).
 b. If a directory is renamed starting with “RX_[Nama]”, then that directory and its contents will be encoded with a rename according to problem 1 with an additional Vigenere Cipher algorithm with “SISOP” as it's key (Case-sensitive, Atbash + Vigenere).
@@ -59,3 +113,22 @@ INFO::28052021-10:01:00:RENAME::/test.txt::/rename.txt
 Notes: 
 It is not allowed to use system () and exec * (), unless there are exceptions in the question.
 The work is only done in 1 C program file with the format name SinSeiFS_ [Group] .c. 
+
+void log_v2(char *str, int type) {
+    FILE *log_file = fopen(logpath, "a");
+
+    time_t current_time;
+    time(&current_time);
+    struct tm *time_info;
+    time_info = localtime(&current_time);
+
+    if (type == INFO) {
+        fprintf(log_file, "INFO::%d%d%d-%d:%d:%d:%s\n", time_info->tm_mday,
+                time_info->tm_mon, time_info->tm_year, time_info->tm_hour,
+                time_info->tm_min, time_info->tm_sec, str);
+    } else if (type == WARNING) {
+        fprintf(log_file, "WARNING::%d%d%d-%d:%d:%d:%s\n", time_info->tm_mday,
+                time_info->tm_mon, time_info->tm_year, time_info->tm_hour,
+                time_info->tm_min, time_info->tm_sec, str);
+    }
+}
